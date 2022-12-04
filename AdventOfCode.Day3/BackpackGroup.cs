@@ -16,7 +16,7 @@
 			var score = 0;
 			for (int i = 0; i < backpacks.Count; i += 3)
 			{
-				score += backpacks[i].Contents.First(x => backpacks[i + 1].Contents.Contains(x) && backpacks[i + 2].Contents.Contains(x)).Priority;
+				score += backpacks[i].AllContents.First(x => backpacks[i + 1].AllContents.Contains(x) && backpacks[i + 2].AllContents.Contains(x)).Priority;
 			}
 			return score;
 		}

@@ -3,17 +3,19 @@
 	public class Backpack
 	{
 		private readonly int compartmentSize;
-		private List<Item> CompartmentOne => Contents.GetRange(0, compartmentSize);
-		private List<Item> CompartmentTwo => Contents.GetRange(compartmentSize, compartmentSize);
 
 		public Backpack(string contents)
 		{
-			this.Contents = contents.Select(x => new Item(x)).ToList();
-			this.compartmentSize = this.Contents.Count / 2;
+			this.AllContents = contents.Select(x => new Item(x)).ToList();
+			this.compartmentSize = this.AllContents.Count / 2;
 		}
 
-		public List<Item> Contents { get; }
+		public List<Item> AllContents { get; }
 
-		public int GetRepeatedItemPriority() => CompartmentOne.First(x => CompartmentTwo.Contains(x)).Priority;
+		public List<Item> CompartmentOneContents => AllContents.GetRange(0, compartmentSize);
+
+		public List<Item> CompartmentTwoContents => AllContents.GetRange(compartmentSize, compartmentSize);
+
+		public int GetRepeatedItemPriority() => CompartmentOneContents.First(x => CompartmentTwoContents.Contains(x)).Priority;
 	}
 }
