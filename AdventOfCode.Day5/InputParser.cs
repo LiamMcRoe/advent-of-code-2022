@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Day5
 {
@@ -16,35 +17,42 @@ namespace AdventOfCode.Day5
 
 		public List<Stack<char>> GetCrateStacks()
 		{
+			var transposedCratePositions = ParseCratePositions(cratePositions);
 			var stacks = new List<Stack<char>>();
-			for (int i = cratePositions.Length - 1; i >= 0; i--)
-			{ 
-				var parsedLine = ParseCrateLine(cratePositions[i]);
-				for (int j = 0; j <= parsedLine.Length - 1; j++) 
-				{
-					if (stacks.Count <= j) stacks.Add(new Stack<char>());
-					if (parsedLine[j] != ' ') stacks[j].Push(parsedLine[j]);
-				}
+			foreach (var stackString in transposedCratePositions)
+			{
+				stacks.Add(new Stack<char>(stackString));
 			}
 			return stacks;
 		}
 
-		public List<(int NumberToMove, int MoveFromIndex, int MoveToIndex)> GetInstructions()
+		public List<(int NumberToMove, int MoveFromIndex, int MoveToIndex)> GetInstructions() => instructions.Select(x => ParseInstructionLine(x)).ToList();
+
+		private static List<string> ParseCratePositions(string[] cratePositions)
 		{
-			var parsedInstructions = new List<(int NumberToMove, int MoveFromIndex, int MoveToIndex)>();
-			foreach (var instruction in instructions)
+			var rows = cratePositions.Length;
+			var cols = cratePositions.Max(x => x.Length);
+
+			// Transpose so that each string defines a single stack of crates.
+			var result = new List<string>();
+			for (int i = 0; i < cols; i++)
 			{
-				var splitInstruction = instruction.Split(' ');
-				parsedInstructions.Add((int.Parse(splitInstruction[1]), int.Parse(splitInstruction[3]) - 1, int.Parse(splitInstruction[5]) - 1));
+				var sb = new StringBuilder();
+				for (int j = rows - 1; j >= 0; j--)
+				{
+					// Only care about including letters since these are our crates.
+					if (char.IsLetter(cratePositions[j][i])) sb.Append(cratePositions[j][i]);
+				}
+				var stackString = sb.ToString();
+				if (!string.IsNullOrEmpty(stackString)) result.Add(stackString);
 			}
-			return parsedInstructions;
+			return result;
 		}
 
-		private string ParseCrateLine(string crateLine)
+		private static (int NumberToMove, int MoveFromIndex, int MoveToIndex) ParseInstructionLine(string instructionLine)
 		{
-			var parsedLine = new StringBuilder();
-			for (int i = 1; i <= crateLine.Length - 1; i += 4) parsedLine.Append(crateLine[i]);
-			return parsedLine.ToString();
+			var numbers = Regex.Matches(instructionLine, @"\d+").Select(x => int.Parse(x.Value)).ToArray();
+			return (NumberToMove: numbers[0], MoveFromIndex: numbers[1] - 1, MoveToIndex: numbers[2] - 1);
 		}
 	}
 }
