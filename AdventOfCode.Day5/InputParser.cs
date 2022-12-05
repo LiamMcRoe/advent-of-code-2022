@@ -12,7 +12,6 @@ namespace AdventOfCode.Day5
 			var divideIndex = Array.IndexOf(input, string.Empty);
 			this.cratePositions = input[..(divideIndex - 1)];
 			this.instructions = input[(divideIndex + 1)..];
-			foreach(var c in cratePositions) Console.WriteLine(c);
 		}
 
 		public List<Stack<char>> GetCrateStacks()
