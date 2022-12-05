@@ -15,16 +15,7 @@ namespace AdventOfCode.Day5
 			this.instructions = input[(divideIndex + 1)..];
 		}
 
-		public List<Stack<char>> GetCrateStacks()
-		{
-			var transposedCratePositions = ParseCratePositions(cratePositions);
-			var stacks = new List<Stack<char>>();
-			foreach (var stackString in transposedCratePositions)
-			{
-				stacks.Add(new Stack<char>(stackString));
-			}
-			return stacks;
-		}
+		public List<Stack<char>> GetCrateStacks() => ParseCratePositions(cratePositions).Select(x => new Stack<char>(x)).ToList();
 
 		public List<(int NumberToMove, int MoveFromIndex, int MoveToIndex)> GetInstructions() => instructions.Select(x => ParseInstructionLine(x)).ToList();
 

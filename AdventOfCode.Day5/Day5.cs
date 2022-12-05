@@ -6,27 +6,22 @@ namespace AdventOfCode.Day5
 	{
 		public static void Run(string inputPath)
 		{
-			Console.WriteLine($"Part one final positions: {GetFinalPositions(inputPath, false)}");
-			Console.WriteLine($"Part two final positions: {GetFinalPositions(inputPath, true)}");
+			Console.WriteLine($"Part one final positions: {GetFinalCratePositions(inputPath, false)}");
+			Console.WriteLine($"Part two final positions: {GetFinalCratePositions(inputPath, true)}");
 		}
 
-		private static string GetFinalPositions(string inputPath, bool moveMultiple)
+		private static string GetFinalCratePositions(string inputPath, bool moveMultiple)
 		{
 			var parser = new InputParser(File.ReadAllLines(inputPath));
 			var crates = parser.GetCrateStacks();
 			SortCrates(crates, parser.GetInstructions(), moveMultiple);
 			var sb = new StringBuilder();
-			foreach (var crateStack in crates) sb.Append(crateStack.TryPeek(out var crate) ? crate : ' ');
+			crates.ForEach(x => sb.Append(x.TryPeek(out var crate) ? crate : ' '));
 			return sb.ToString();
 		}
 
-		private static void SortCrates(List<Stack<char>> crates, List<(int NumberToMove, int MoveFromIndex, int MoveToIndex)> instructions, bool moveMultiple) 
-		{
-			foreach (var instruction in instructions)
-			{
-				ExecuteInstruction(crates, instruction, moveMultiple);
-			}
-		}
+		private static void SortCrates(List<Stack<char>> crates, List<(int NumberToMove, int MoveFromIndex, int MoveToIndex)> instructions, bool moveMultiple) =>
+			instructions.ForEach(x => ExecuteInstruction(crates, x, moveMultiple));
 
 		private static void ExecuteInstruction(List<Stack<char>> crates, (int NumberToMove, int MoveFromIndex, int MoveToIndex) instruction, bool moveMultiple)
 		{
