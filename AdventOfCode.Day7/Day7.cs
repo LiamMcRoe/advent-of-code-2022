@@ -12,7 +12,7 @@
 		{
 			var instructions = File.ReadAllLines(inputPath);
 			var fileSystem = new FileSystem(instructions);
-			Console.WriteLine($"Total size of directories with size <= 100000: {fileSystem.Root.GetTotalSizeUnderThreshold(100000)}");
+			Console.WriteLine($"Total size of directories with size <= 100000: {fileSystem.Root.SumSizesUnderThreshold(100000)}");
 		}
 
 		private static void PartTwo(string inputPath)

@@ -29,10 +29,10 @@
 			return this;
 		}
 
-		public int GetTotalSizeUnderThreshold(int threshold)
+		public int SumSizesUnderThreshold(int threshold)
 		{
 			var mySize = GetSize();
-			return children.Values.Select(x => x.GetTotalSizeUnderThreshold(threshold)).Sum() + (mySize <= threshold ? mySize : 0);
+			return children.Values.Select(x => x.SumSizesUnderThreshold(threshold)).Sum() + (mySize <= threshold ? mySize : 0);
 		}
 
 		public int GetSmallestOverThreshold(int threshold)
