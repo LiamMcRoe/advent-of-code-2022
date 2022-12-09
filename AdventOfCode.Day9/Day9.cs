@@ -47,12 +47,12 @@ namespace AdventOfCode.Day9
 			return currentPoints;
 		}
 
-		private static Point GetNewHeadPosition(Point Head, string direction) => direction switch
+		private static Point GetNewHeadPosition(Point head, string direction) => direction switch
 		{
-			"U" => new Point(Head.X, Head.Y + 1),
-			"D" => new Point(Head.X, Head.Y - 1),
-			"L" => new Point(Head.X - 1, Head.Y),
-			"R" => new Point(Head.X + 1, Head.Y),
+			"U" => new Point(head.X, head.Y + 1),
+			"D" => new Point(head.X, head.Y - 1),
+			"L" => new Point(head.X - 1, head.Y),
+			"R" => new Point(head.X + 1, head.Y),
 			_ => throw new InvalidOperationException()
 		};
 
