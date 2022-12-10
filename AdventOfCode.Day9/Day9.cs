@@ -7,14 +7,13 @@ namespace AdventOfCode.Day9
 		public static void Run(string inputPath)
 		{
 			var input = File.ReadAllLines(inputPath);
-
 			Console.WriteLine($"Part one: {GetNumberOfVisitedPoints(input, 2)}");
 			Console.WriteLine($"Part two: {GetNumberOfVisitedPoints(input, 10)}");
 		}
 
-		private static int GetNumberOfVisitedPoints(string[] instructions, int numberKnots)
+		private static int GetNumberOfVisitedPoints(string[] instructions, int numberOfMarkers)
 		{
-			List<Point> currentPoints = Enumerable.Repeat(new Point(0, 0), numberKnots).ToList();
+			List<Point> currentPoints = Enumerable.Repeat(new Point(0, 0), numberOfMarkers).ToList();
 			var visitedPoints = new List<Point>() { currentPoints.Last() };
 			foreach (var instruction in instructions)
 			{
@@ -26,10 +25,11 @@ namespace AdventOfCode.Day9
 		private static List<Point> ProcessInstruction(List<Point> currentPoints, List<Point> visitedPoints, string instruction)
 		{
 			var decomposedInstruction = instruction.Split(' ');
+			var direction = decomposedInstruction[0];
 			var numMoves = int.Parse(decomposedInstruction[1]);
-			for (int i = 1; i <= numMoves; i++) 
+			for (int i = 1; i <= numMoves; i++)
 			{
-				currentPoints = ProcessSingleMove(currentPoints, visitedPoints, decomposedInstruction[0]);
+				currentPoints = ProcessSingleMove(currentPoints, visitedPoints, direction);
 			}
 			return currentPoints;
 		}
