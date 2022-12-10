@@ -13,8 +13,8 @@ namespace AdventOfCode.Day10
 			Width = width;
 			this.drawingChar = drawingChar;
 			drawingGrid = new char[height, width];
-			for (int i = 0; i < drawingGrid.GetLength(0); i++)
-				for (int j = 0; j < drawingGrid.GetLength(1); j++)
+			for (int i = 0; i < Height; i++)
+				for (int j = 0; j < Width; j++)
 					drawingGrid[i, j] = whitespaceChar;
 		}
 
@@ -28,10 +28,10 @@ namespace AdventOfCode.Day10
 
 		public void ConsoleRender()
 		{
-			for (int i = 0; i < drawingGrid.GetLength(0); i++)
+			for (int i = 0; i < Height; i++)
 			{
 				var line = new StringBuilder();
-				for (int j = 0; j < drawingGrid.GetLength(1); j++)
+				for (int j = 0; j < Width; j++)
 				{
 					line.Append(drawingGrid[i, j]);
 				}
