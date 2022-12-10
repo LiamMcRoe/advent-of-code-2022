@@ -13,7 +13,7 @@
 			this.captureSignalStart = captureSignalStart;
 			this.captureSignalFrequency = captureSignalFrequency;
 			cycleNumber = 1;
-			register = 1;			
+			register = 1;
 		}
 
 		public int TotalSignalStrength { get; private set; }
@@ -30,16 +30,17 @@
 			switch (instruction)
 			{
 				case "noop":
-					PerformCycles(1, () => { });
+					PerformCycles(1);
 					break;
 				default:
+					PerformCycles(2);
 					var toAdd = int.Parse(instruction.Split(' ')[1]);
-					PerformCycles(2, () => register += toAdd);
+					register += toAdd;
 					break;
 			}
 		}
 
-		private void PerformCycles(int numberOfCycles, Action endOfInstructionAction)
+		private void PerformCycles(int numberOfCycles)
 		{
 			while (numberOfCycles != 0)
 			{
@@ -50,7 +51,6 @@
 				cycleNumber++;
 				numberOfCycles--;
 			}
-			endOfInstructionAction();
 		}
 	}
 }
