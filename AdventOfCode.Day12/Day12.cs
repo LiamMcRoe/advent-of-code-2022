@@ -19,34 +19,33 @@
 				}
 			}
 
-			var part1 = GetShortestPath(graph, part1Start, x => x == 'E', (a, b) => NormaliseHeight(b) <= NormaliseHeight(a) + 1);
-			var part2 = GetShortestPath(graph, part2Start, x => x == 'a' || x == 'S', (a, b) => NormaliseHeight(a) <= NormaliseHeight(b) + 1);
+			var part1 = GetShortestPathLength(graph, part1Start, x => x == 'E', (a, b) => NormaliseHeight(b) <= NormaliseHeight(a) + 1);
+			var part2 = GetShortestPathLength(graph, part2Start, x => x == 'a' || x == 'S', (a, b) => NormaliseHeight(a) <= NormaliseHeight(b) + 1);
 
 			Console.WriteLine($"Shortest path from origin (part one): {part1}");
 			Console.WriteLine($"Shortest path from 'a' node (part two): {part2}");
 		}
 
-		private static int GetShortestPath(char[,] graph, (int i, int j) startNode, Func<char, bool> endCondition, Func<char, char, bool> adjacencyTest)
+		private static int GetShortestPathLength(char[,] graph, (int i, int j) startNode, Func<char, bool> endCondition, Func<char, char, bool> adjacencyTest)
 		{
 			var maxRowIndex = graph.GetLength(0) - 1;
 			var maxColIndex = graph.GetLength(1) - 1;
 
 			List<(int i, int j)> visitedNodes = new() { startNode };
-			List<(int i, int j)> nodesToVisit = new() { startNode };
+			Queue<(int i, int j, int pathLength)> nodesToVisit = new();
+			nodesToVisit.Enqueue((startNode.i, startNode.j, 0));
 			
-			var steps = 0;
 			while (nodesToVisit.Any())
 			{
-				var nextStepNodes = new List<(int i, int j)>();
-				foreach (var node in nodesToVisit)
+				var node = nodesToVisit.Dequeue();
+				if (endCondition(graph[node.i, node.j])) return node.pathLength;
+				var neighbours = GetUnvisitedNeighbours(graph, (node.i, node.j), maxRowIndex, maxColIndex, visitedNodes, adjacencyTest);
+
+				foreach (var neighbour in neighbours)
 				{
-					if (endCondition(graph[node.i, node.j])) return steps;
-					var neighbours = GetUnvisitedNeighbours(graph, node, maxRowIndex, maxColIndex, visitedNodes, adjacencyTest);
-					visitedNodes.AddRange(neighbours);
-					nextStepNodes.AddRange(neighbours);
+					visitedNodes.Add(neighbour);
+					nodesToVisit.Enqueue((neighbour.i, neighbour.j, node.pathLength + 1));
 				}
-				nodesToVisit = nextStepNodes;
-				steps++;
 			}
 			return -1;
 		}
