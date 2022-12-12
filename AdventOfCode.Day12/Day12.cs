@@ -6,15 +6,15 @@
 		{
 			var input = File.ReadAllLines(inputPath);
 			var graph = new char[input.Length, input[1].Length];
-			var part1Start = (0, 0);
-			var part2Start = (0, 0);
+			NodePosition part1Start = new (0, 0);
+			NodePosition part2Start = new (0, 0);
 			for (int i = 0; i < input.Length; i++)
-			{ 
+			{
 				for (int j = 0; j < input[i].Length; j++)
 				{
 					var point = input[i][j];
-					if (point == 'S') part1Start = (i, j);
-					if (point == 'E') part2Start = (i, j);
+					if (point == 'S') part1Start = new (i, j);
+					if (point == 'E') part2Start = new (i, j);
 					graph[i, j] = point;
 				}
 			}
@@ -26,50 +26,46 @@
 			Console.WriteLine($"Shortest path from 'a' node (part two): {part2}");
 		}
 
-		private static int GetShortestPathLength(char[,] graph, (int i, int j) startNode, Func<char, bool> endCondition, Func<char, char, bool> adjacencyTest)
+		private static int GetShortestPathLength(char[,] graph, NodePosition startPosition, Func<char, bool> endCondition, Func<char, char, bool> adjacencyTest)
 		{
 			var maxRowIndex = graph.GetLength(0) - 1;
 			var maxColIndex = graph.GetLength(1) - 1;
 
-			List<(int i, int j)> visitedNodes = new() { startNode };
-			Queue<(int i, int j, int pathLength)> nodesToVisit = new();
-			nodesToVisit.Enqueue((startNode.i, startNode.j, 0));
+			List<NodePosition> visitedNodes = new() { startPosition };
+			Queue<(NodePosition node, int pathLength)> nodesToVisit = new();
+			nodesToVisit.Enqueue((startPosition, 0));
 			
 			while (nodesToVisit.Any())
 			{
-				var node = nodesToVisit.Dequeue();
-				if (endCondition(graph[node.i, node.j])) return node.pathLength;
-				var neighbours = GetUnvisitedNeighbours(graph, (node.i, node.j), maxRowIndex, maxColIndex, visitedNodes, adjacencyTest);
+				var (nodePosition, pathLength) = nodesToVisit.Dequeue();
+				if (endCondition(graph.GetValue(nodePosition))) return pathLength;
+				var neighbours = GetUnvisitedNeighbours(graph, nodePosition, maxRowIndex, maxColIndex, visitedNodes, adjacencyTest);
 
 				foreach (var neighbour in neighbours)
 				{
 					visitedNodes.Add(neighbour);
-					nodesToVisit.Enqueue((neighbour.i, neighbour.j, node.pathLength + 1));
+					nodesToVisit.Enqueue((neighbour, pathLength + 1));
 				}
 			}
 			return -1;
 		}
 
-		private static List<(int i, int j)> GetUnvisitedNeighbours(char[,] graph, (int i, int j) node, int maxRowIndex, int maxColIndex, List<(int i, int j)> visitedNodes, Func<char, char, bool> adjacencyTest) =>
-			GetCardinalNeighbours(node)
+		private static List<NodePosition> GetUnvisitedNeighbours(char[,] graph, NodePosition nodePosition, int maxRowIndex, int maxColIndex, List<NodePosition> visitedNodes, Func<char, char, bool> adjacencyTest) =>
+			GetCardinalNeighbours(nodePosition)
 			.Where(x =>
-				NodeInBounds(x, maxRowIndex, maxColIndex)
-				&& adjacencyTest(graph[node.i, node.j], graph[x.i, x.j])
+				x.IsInBounds(maxRowIndex, maxColIndex)
+				&& adjacencyTest(graph.GetValue(nodePosition), graph.GetValue(x))
 				&& !visitedNodes.Contains(x))
 			.ToList();
 
-		private static List<(int i, int j)> GetCardinalNeighbours((int i, int j) node) =>
-			new() { (node.i - 1, node.j), (node.i + 1, node.j), (node.i, node.j - 1), (node.i, node.j + 1) };
+		private static List<NodePosition> GetCardinalNeighbours(NodePosition nodePosition) =>
+			new() { new (nodePosition.IPosition - 1, nodePosition.JPosition), new (nodePosition.IPosition + 1, nodePosition.JPosition), new (nodePosition.IPosition, nodePosition.JPosition - 1), new (nodePosition.IPosition, nodePosition.JPosition + 1) };
 
 		private static char NormaliseHeight(char original) =>
 			original == 'S' ? 'a' :
 			original == 'E' ? 'z' :
 			original;
 
-		private static bool NodeInBounds((int i, int j) node, int maxRowIndex, int maxColIndex) =>
-			0 <= node.i
-			&& node.i <= maxRowIndex
-			&& 0 <= node.j
-			&& node.j <= maxColIndex;
+		private static T GetValue<T>(this T[,] matrix, NodePosition nodePosition) => matrix[nodePosition.IPosition, nodePosition.JPosition];
 	}
 }
