@@ -59,7 +59,13 @@
 			.ToList();
 
 		private static List<NodePosition> GetCardinalNeighbours(NodePosition nodePosition) =>
-			new() { new (nodePosition.IPosition - 1, nodePosition.JPosition), new (nodePosition.IPosition + 1, nodePosition.JPosition), new (nodePosition.IPosition, nodePosition.JPosition - 1), new (nodePosition.IPosition, nodePosition.JPosition + 1) };
+			new()
+			{
+				new (nodePosition.IPosition - 1, nodePosition.JPosition),
+				new (nodePosition.IPosition + 1, nodePosition.JPosition),
+				new (nodePosition.IPosition, nodePosition.JPosition - 1),
+				new (nodePosition.IPosition, nodePosition.JPosition + 1)
+			};
 
 		private static char NormaliseHeight(char original) =>
 			original == 'S' ? 'a' :
