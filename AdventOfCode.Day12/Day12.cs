@@ -72,6 +72,7 @@
 			original == 'E' ? 'z' :
 			original;
 
-		private static T GetValue<T>(this T[,] matrix, NodePosition nodePosition) => matrix[nodePosition.IPosition, nodePosition.JPosition];
+		private static T GetValue<T>(this T[,] matrix, NodePosition nodePosition) =>
+			matrix[nodePosition.IPosition, nodePosition.JPosition];
 	}
 }
