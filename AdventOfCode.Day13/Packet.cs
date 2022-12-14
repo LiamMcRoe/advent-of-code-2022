@@ -11,7 +11,7 @@ namespace AdventOfCode.Day13
 
 		public JsonArray ParsedPacket { get; init; }
 
-		public bool IsLessThan(Packet other) => CompareArrays(this.ParsedPacket, other.ParsedPacket) == true;
+		public bool IsLessThan(Packet otherPacket) => CompareArrays(this.ParsedPacket, otherPacket.ParsedPacket) == true;
 
 		private static bool? CompareArrays(JsonArray localArray, JsonArray otherArray)
 		{
@@ -32,7 +32,7 @@ namespace AdventOfCode.Day13
 			{
 				var localInt = localVal.GetValue<int>();
 				var otherInt = otherVal.GetValue<int>();
-				return localInt == otherInt ? null : localInt <= otherInt;
+				return localInt == otherInt ? null : localInt < otherInt;
 			}
 			
 			return CompareArrays(ToJsonArray(localNode), ToJsonArray(otherNode));
