@@ -25,7 +25,7 @@ namespace AdventOfCode.Day14
 				var restingPosition = MoveSand(startingPoint, blockedPoints);
 				blockedPoints.Add(restingPosition);
 			}
-			Console.WriteLine($"Sand settled before it falls infinitely (part one) {blockedPoints.Count - rockCount - 1}");
+			Console.WriteLine($"Sand settled before it falls infinitely (part one): {blockedPoints.Count - rockCount - 1}");
 		}
 
 		private static void PartTwo(string[] input) 
@@ -40,7 +40,7 @@ namespace AdventOfCode.Day14
 				var restingPosition = MoveSand(startingPoint, blockedPoints, floorY);
 				blockedPoints.Add(restingPosition);
 			}
-			Console.WriteLine($"Sand settled before cave filled (part two) {blockedPoints.Count - rockCount}");
+			Console.WriteLine($"Sand settled before cave filled (part two): {blockedPoints.Count - rockCount}");
 		}
 
 		private static HashSet<(int x, int y)> MapRocks(string[] input)
