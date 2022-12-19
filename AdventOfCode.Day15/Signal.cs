@@ -22,17 +22,17 @@ namespace AdventOfCode.Day15
 
 		public long Distance => Math.Abs(signalLocation.X - ClosestBeacon.X) + Math.Abs(signalLocation.Y - ClosestBeacon.Y);
 
-		public List<Point> GetBlockedPointsByRow(int y)
-		{
-			if ((signalLocation.Y < y && signalLocation.Y + Distance < y) || signalLocation.Y > y && signalLocation.Y - Distance > y)
-				return new List<Point>();
+		//public List<Point> GetBlockedPointsByRow(int y)
+		//{
+		//	if ((signalLocation.Y < y && signalLocation.Y + Distance < y) || signalLocation.Y > y && signalLocation.Y - Distance > y)
+		//		return new List<Point>();
 
-			var x1 = Distance - Math.Abs(signalLocation.Y - y) + signalLocation.X;
-			var x2 = signalLocation.X + Math.Abs(signalLocation.Y - y) - Distance;
+		//	var x1 = Distance - Math.Abs(signalLocation.Y - y) + signalLocation.X;
+		//	var x2 = signalLocation.X + Math.Abs(signalLocation.Y - y) - Distance;
 
-			if (x1 <= x2) return Enumerable.Range((int)x1, (int)(x2 - x1 + 1)).Select(x => new Point(x, y)).ToList();
-			return Enumerable.Range((int)x2, (int)(x1 - x2 + 1)).Select(x => new Point(x, y)).ToList();
-		}
+		//	if (x1 <= x2) return Enumerable.Range((int)x1, (int)(x2 - x1 + 1)).Select(x => new Point(x, y)).ToList();
+		//	return Enumerable.Range((int)x2, (int)(x1 - x2 + 1)).Select(x => new Point(x, y)).ToList();
+		//}
 
 		public (long xMin, long xMax)? GetBlockedInterval(int y)
 		{

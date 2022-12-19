@@ -16,9 +16,7 @@
 
 		public long Height { get; init; }
 
-		public bool StatesEquivalent(KnownState newState)
-		{
-			return BlockedPointsAboveFloor.SequenceEqual(newState.BlockedPointsAboveFloor) && MoveIndex == newState.MoveIndex && BlocksDropped % 5 == newState.BlocksDropped % 5;
-		}
+		public bool EquivalentToState(KnownState newState) =>
+			BlockedPointsAboveFloor.SequenceEqual(newState.BlockedPointsAboveFloor) && MoveIndex == newState.MoveIndex && BlocksDropped % 5 == newState.BlocksDropped % 5;
 	}
 }
