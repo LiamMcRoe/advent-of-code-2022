@@ -14,7 +14,7 @@ namespace AdventOfCode.Day16
 		private const string flowRatePattern = @"\d+";
 		private const string connectedToPattern = @"(?<=to valve).*";
 
-		private readonly Dictionary<string, int> knownStates;
+		public readonly Dictionary<string, int> knownStates;
 		private readonly List<Valve> connectedValves;
 
 		public Valve(string valve)
@@ -36,22 +36,19 @@ namespace AdventOfCode.Day16
 
 		public void AddConnectedValve(Valve valve) => connectedValves.Add(valve);
 
-		public int CalculateMaxPressueReleased(int minsLeft, int currentFlowRate, Dictionary<string, bool> previouslyVisitedValves)
+		public int CalculateMaxPressueReleased(int minsLeft, int currentFlowRate, HashSet<string> openValves)
 		{
 			if (minsLeft == 0) return 0;
 			if (minsLeft == 1) return currentFlowRate;
 
 			// Check if we have hit this exact state before, ie same valves open with same time left. If so, just return the known answer.
-			var stateKey = GetStateKey(minsLeft, previouslyVisitedValves);
+			var stateKey = GetStateKey(minsLeft, openValves);
 			if (knownStates.TryGetValue(stateKey, out var score)) return score;
-
-			var thisPreviouslyVisited = previouslyVisitedValves.ContainsKey(ValveCode);
-			var thisCurrentlyOpen = thisPreviouslyVisited && previouslyVisitedValves[ValveCode];
 
 			var maxPressureReleased = 0;
 			foreach (var childValve in connectedValves)
 			{
-				var childMaxPressureReleased = CalculateChildMaxPressureReleased(childValve, minsLeft, currentFlowRate, previouslyVisitedValves, thisPreviouslyVisited, thisCurrentlyOpen);
+				var childMaxPressureReleased = CalculateChildMaxPressureReleased(childValve, minsLeft, currentFlowRate, openValves);
 				maxPressureReleased = childMaxPressureReleased > maxPressureReleased ? childMaxPressureReleased : maxPressureReleased;
 			}
 
@@ -59,21 +56,20 @@ namespace AdventOfCode.Day16
 			return maxPressureReleased;
 		}
 
-		private int CalculateChildMaxPressureReleased(Valve childValve, int minsLeft, int currentFlowRate, Dictionary<string, bool> previouslyVisitedValves, bool thisPreviouslyVisited, bool thisCurrentlyOpen)
+		private int CalculateChildMaxPressureReleased(Valve childValve, int minsLeft, int currentFlowRate, HashSet<string> openValves)
 		{
-			var pathIncludingThis = new Dictionary<string, bool>(previouslyVisitedValves);
-			if (!thisPreviouslyVisited) pathIncludingThis.Add(ValveCode, thisCurrentlyOpen);
-			var scoreWithoutOpening = childValve.CalculateMaxPressueReleased(minsLeft - 1, currentFlowRate, pathIncludingThis) + currentFlowRate;
+			var openIncludingThis = new HashSet<string>(openValves);
+			var scoreWithoutOpening = childValve.CalculateMaxPressueReleased(minsLeft - 1, currentFlowRate, openIncludingThis) + currentFlowRate;
 			var scoreWithOpening = 0;
-			if (FlowRate > 0 && !thisCurrentlyOpen)
+			if (FlowRate > 0 && !openIncludingThis.Contains(ValveCode))
 			{
-				pathIncludingThis[ValveCode] = true;
-				scoreWithOpening = childValve.CalculateMaxPressueReleased(minsLeft - 2, currentFlowRate + FlowRate, pathIncludingThis) + (2 * currentFlowRate) + FlowRate;
+				openIncludingThis.Add(ValveCode);
+				scoreWithOpening = childValve.CalculateMaxPressueReleased(minsLeft - 2, currentFlowRate + FlowRate, openIncludingThis) + (2 * currentFlowRate) + FlowRate;
 			}
+			
 			return (scoreWithOpening > scoreWithoutOpening) ? scoreWithOpening : scoreWithoutOpening;	
 		}
 
-		private static string GetStateKey(int minsLeft, Dictionary<string, bool> previouslyVisitedValves) =>
-			string.Join(',', previouslyVisitedValves.Where(x => x.Value).Select(x => x.Key).OrderBy(x => x)) + minsLeft;
+		private static string GetStateKey(int minsLeft, HashSet<string> openValves) => string.Join(',', openValves.OrderBy(x => x)) + $"[{minsLeft}]";
 	}
 }

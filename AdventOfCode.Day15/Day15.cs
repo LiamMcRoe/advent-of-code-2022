@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -12,68 +11,58 @@ namespace AdventOfCode.Day15
 	{
 		public static void Run(string inputPath)
 		{
-			BigInteger x = 2655411;
-			BigInteger y = 3166538;
-			BigInteger r = (x * 4000000) + y;
-
-			Console.WriteLine(r);
 			var signals = File.ReadAllLines(inputPath).Select(x => new Signal(x)).ToList();
-			//var blockedPoints = new List<Point>();
-			//foreach (var signal in signals) blockedPoints.AddRange(signal.GetBlockedPointsByRow(2000000));
-			//blockedPoints.RemoveAll(x => signals.Select(s => s.ClosestBeacon).Contains(x));
-			//Console.WriteLine(blockedPoints.Distinct().Count());
+			PartOne(signals);
+			PartTwo(signals);
+		}
 
-			var point = GetDistressBeacon(signals);
+		private static void PartOne(List<Signal> signals)
+		{
+			var blockedPoints = new List<Point>();
+			foreach (var signal in signals) blockedPoints.AddRange(signal.GetBlockedPointsByRow(2000000));
+			blockedPoints.RemoveAll(x => signals.Select(s => s.ClosestBeacon).Contains(x));
+			Console.WriteLine(blockedPoints.Distinct().Count());
+		}
 
-			Console.WriteLine((point.X * 4000000) + point.Y);
-			
-
+		private static void PartTwo(List<Signal> signals)
+		{
+			var beaconLocation = GetDistressBeacon(signals);
+			long answer = (beaconLocation.X * 4000000) + beaconLocation.Y;
+			Console.WriteLine(answer);
 		}
 
 		private static Point GetDistressBeacon(List<Signal> signals)
 		{
-			var xVals = Enumerable.Range(0, 4000001);
-
 			for (int y = 0; y <= 4000000; y++)
 			{
-				var blocked = new List<(int xMin, int xMax)>();
+				var blocked = new List<(long xMin, long xMax)>();
 				foreach (var signal in signals)
 				{
 					var b = signal.GetBlockedInterval(y);
 					if (b.HasValue) blocked.Add(b.Value);
-					
 				}
-				if (AllBlocked(blocked)) continue;
-				var x = xVals.Where(x => !blocked.Any(b => b.xMin <= x && x <= b.xMax));
-				if (x.Any()) 
-					return new Point(x.First(), y);
-				
+				var x = FindUnblockedPoint(blocked, y);
+				if (x.HasValue) return x.Value;
 			}
 
 			return new Point(0, 0);
 		}
 
-		private static bool AllBlocked(List<(int xMin, int xMax)> blocked)
+		private static Point? FindUnblockedPoint(List<(long xMin, long xMax)> blocked, long y)
 		{
-			// This should probably return the x since it is doing all the work to find it anyway.
 			var min = blocked.OrderBy(x => x.xMin).ToArray();
-			if (!min.Any(x => x.xMin <= 0))
-				return false;
+			if (min[0].xMin > 0) return new Point(0, y);
 
 			var lastMax = min.First().xMax;
-			for(int i = 1; i < min.Count(); i++)
+			for(int i = 1; i < min.Length; i++)
 			{
 				if ((lastMax < min[i].xMin))
 				{
-					return false;
+					return new Point(lastMax + 1, y);
 				}
 				if (min[i].xMax > lastMax) lastMax = min[i].xMax;
 			}
-			if (!min.Any(x => x.xMax >= 4000000))
-				return false;
-
-			return true;
-			
-		}
+			return lastMax < 4000000 ? new Point(4000000, y) : null;
+		} 
 	}
 }

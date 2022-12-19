@@ -20,7 +20,7 @@ namespace AdventOfCode.Day15
 
 		public Point ClosestBeacon { get; init; }
 
-		public int Distance => Math.Abs(signalLocation.X - ClosestBeacon.X) + Math.Abs(signalLocation.Y - ClosestBeacon.Y);
+		public long Distance => Math.Abs(signalLocation.X - ClosestBeacon.X) + Math.Abs(signalLocation.Y - ClosestBeacon.Y);
 
 		public List<Point> GetBlockedPointsByRow(int y)
 		{
@@ -30,24 +30,19 @@ namespace AdventOfCode.Day15
 			var x1 = Distance - Math.Abs(signalLocation.Y - y) + signalLocation.X;
 			var x2 = signalLocation.X + Math.Abs(signalLocation.Y - y) - Distance;
 
-			if (x1 <= x2) return Enumerable.Range(x1, x2 - x1 + 1).Select(x => new Point(x, y)).ToList();
-			return Enumerable.Range(x2, x1 - x2 + 1).Select(x => new Point(x, y)).ToList();
-			// else y intersects, so find all points on y with distance <= distance
-			// find both x such that (X, y) = distance
+			if (x1 <= x2) return Enumerable.Range((int)x1, (int)(x2 - x1 + 1)).Select(x => new Point(x, y)).ToList();
+			return Enumerable.Range((int)x2, (int)(x1 - x2 + 1)).Select(x => new Point(x, y)).ToList();
 		}
 
-		public (int xMin, int xMax)? GetBlockedInterval(int y)
+		public (long xMin, long xMax)? GetBlockedInterval(int y)
 		{
 			if ((signalLocation.Y < y && signalLocation.Y + Distance < y) || signalLocation.Y > y && signalLocation.Y - Distance > y)
-				return null; //Is this the issue
+				return null;
 
 			var x1 = Distance - Math.Abs(signalLocation.Y - y) + signalLocation.X;
 			var x2 = signalLocation.X + Math.Abs(signalLocation.Y - y) - Distance;
 
-
-			return (x2, x1);
-			// else y intersects, so find all points on y with distance <= distance
-			// find both x such that (X, y) = distance
+			return x2 < x1 ? (x2, x1) : (x1, x2);
 		}
 	}
 }
