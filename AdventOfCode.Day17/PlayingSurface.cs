@@ -5,12 +5,13 @@ namespace AdventOfCode.Day17
 	public class PlayingSurface
 	{
 		private readonly string moves;
-		private readonly int numberOfMoves;
 		private readonly int leftWallIndex;
 		private readonly int rightWallIndex;
 		private readonly HashSet<Point> blockedPoints;
 		private readonly List<KnownState> knownStates;
-		
+
+		private long highestPoint;
+
 		private bool moveDown;
 		private int moveIndex;
 
@@ -18,12 +19,10 @@ namespace AdventOfCode.Day17
 		private long cycleStartAfter;
 		private long cycleEndAfter;
 		private long heightAddedByCycle;
-		private long highestPoint;
 
 		public PlayingSurface(string moves)
 		{
 			this.moves = moves;
-			numberOfMoves = moves.Length;
 			leftWallIndex = 0;
 			rightWallIndex = 8;
 			blockedPoints = new HashSet<Point>();
@@ -68,7 +67,7 @@ namespace AdventOfCode.Day17
 			var pointsInState = blockedPoints.Where(p => p.Y > blockedLineY);
 			var shiftedPoints = pointsInState.Select(p => new Point(p.X, p.Y - blockedLineY)).ToHashSet();
 			var state = new KnownState(shiftedPoints, moveIndex, blockNumber, highestPoint);
-			var cycleStart = knownStates.Where(s => s.StatesEquivalent(state)).FirstOrDefault();
+			var cycleStart = knownStates.Where(s => s.EquivalentToState(state)).FirstOrDefault();
 			if (!cycleFound && cycleStart != null)
 			{
 				cycleStartAfter = cycleStart.BlocksDropped;
@@ -93,7 +92,7 @@ namespace AdventOfCode.Day17
 				var move = moves[moveIndex];
 				if (move == '>') block.MoveRight(blockedPoints, rightWallIndex);
 				else block.MoveLeft(blockedPoints, leftWallIndex);
-				moveIndex = (moveIndex + 1 ) % numberOfMoves;
+				moveIndex = (moveIndex + 1 ) % moves.Length;
 				moveDown = true;
 				return true;
 			}

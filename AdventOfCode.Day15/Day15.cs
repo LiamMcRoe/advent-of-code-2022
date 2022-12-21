@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventOfCode.Day15
+﻿namespace AdventOfCode.Day15
 {
 	public class Day15
 	{
@@ -18,51 +11,61 @@ namespace AdventOfCode.Day15
 
 		private static void PartOne(List<Signal> signals)
 		{
-			var blockedPoints = new List<Point>();
-			foreach (var signal in signals) blockedPoints.AddRange(signal.GetBlockedPointsByRow(2000000));
-			blockedPoints.RemoveAll(x => signals.Select(s => s.ClosestBeacon).Contains(x));
-			Console.WriteLine(blockedPoints.Distinct().Count());
+			var blockedIntervals = signals.Select(x => x.GetBlockedInterval(2000000)).Where(x => x.HasValue).Select(x => x!.Value).OrderBy(x => x.xMin).ToList();
+			var mergedIntervals = MergeIntervals(blockedIntervals);
+			long blockedPoints = 0;
+			foreach (var (xMin, xMax) in mergedIntervals)
+			{
+				blockedPoints += xMax - xMin;		
+			}
+			Console.WriteLine($"Blocked points in row 2000000 (part one): {blockedPoints}");
 		}
 
 		private static void PartTwo(List<Signal> signals)
 		{
 			var beaconLocation = GetDistressBeacon(signals);
-			long answer = (beaconLocation.X * 4000000) + beaconLocation.Y;
-			Console.WriteLine(answer);
+			long signalStrength = (beaconLocation.X * 4000000) + beaconLocation.Y;
+			Console.WriteLine($"Tuning frequency from distress signal (part two): {signalStrength}");
 		}
 
 		private static Point GetDistressBeacon(List<Signal> signals)
 		{
-			for (int y = 0; y <= 4000000; y++)
+			var y = 0;
+			while (true)
 			{
-				var blocked = new List<(long xMin, long xMax)>();
+				var blockedIntervals = new List<(long xMin, long xMax)>();
 				foreach (var signal in signals)
 				{
 					var b = signal.GetBlockedInterval(y);
-					if (b.HasValue) blocked.Add(b.Value);
+					if (b.HasValue) blockedIntervals.Add(b.Value);
 				}
-				var x = FindUnblockedPoint(blocked, y);
-				if (x.HasValue) return x.Value;
+				var mergedIntervals = MergeIntervals(blockedIntervals);
+				if (mergedIntervals.Count > 1) return new Point(mergedIntervals[0].xMax + 1, y);
+				if (mergedIntervals.Min(x => x.xMin) > 0) return new Point(0, y);
+				if (mergedIntervals.Max(x => x.xMax < 4000000)) return new Point(4000000, y);
+				y++;
 			}
-
-			return new Point(0, 0);
 		}
 
-		private static Point? FindUnblockedPoint(List<(long xMin, long xMax)> blocked, long y)
+		private static List<(long xMin, long xMax)> MergeIntervals(List<(long xMin, long xMax)> intervals)
 		{
-			var min = blocked.OrderBy(x => x.xMin).ToArray();
-			if (min[0].xMin > 0) return new Point(0, y);
-
-			var lastMax = min.First().xMax;
-			for(int i = 1; i < min.Length; i++)
+			var mergedIntervals = new List<(long xMin, long xMax)>();
+			intervals.Sort();
+			var current = intervals[0];
+			for (int i = 1; i < intervals.Count; i++)
 			{
-				if ((lastMax < min[i].xMin))
+				if (current.xMax < intervals[i].xMin)
 				{
-					return new Point(lastMax + 1, y);
+					mergedIntervals.Add(current);
+					current = intervals[i];
 				}
-				if (min[i].xMax > lastMax) lastMax = min[i].xMax;
+				else
+				{
+					current = (current.xMin, Math.Max(current.xMax, intervals[i].xMax));
+				}
 			}
-			return lastMax < 4000000 ? new Point(4000000, y) : null;
-		} 
+			mergedIntervals.Add(current);
+			return mergedIntervals;
+		}
 	}
 }
