@@ -4,7 +4,7 @@
 	{
 		public static void Run(string inputPath)
 		{
-			var allMonkeys = File.ReadAllLines(inputPath).ToDictionary(x => x.Split(':')[0], x => x.Split(':')[1].Trim());
+			var allMonkeys = File.ReadAllLines(inputPath).Select(x => x.Split(':')).ToDictionary(x => x[0], x => x[1].Trim());
 			PartOne(allMonkeys);
 			PartTwo(allMonkeys);
 		}
