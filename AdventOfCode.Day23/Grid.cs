@@ -22,32 +22,34 @@ namespace AdventOfCode.Day23
             directions = new Queue<Direction>(new[] { Direction.North, Direction.South, Direction.West, Direction.East });
         }
 
+        public bool SimulateRound()
+        {
+            var proposedMoves = GetProposedMoves();
+            var duplicates = proposedMoves.GroupBy(x => x.MoveTo).Where(g => g.Count() > 1).Select(y => y.Key).ToHashSet();
+            proposedMoves.RemoveAll(x => duplicates.Contains(x.MoveTo));
+
+            if (!proposedMoves.Any())
+            {
+                return false;
+            }
+            foreach (var (MoveFrom, MoveTo) in proposedMoves)
+            {
+                elfPositions.Remove(MoveFrom);
+                elfPositions.Add(MoveTo);
+            }
+
+            var direction = directions.Dequeue();
+            directions.Enqueue(direction);
+            return true;
+        }
+
         public int SimulateRounds(int numberOfRounds)
         {
-            var sw = new Stopwatch();
-            sw.Start();
             var roundNumber = 1;
             while (roundNumber <= numberOfRounds)
             {
-                var proposedMoves = GetProposedMoves();
-                var duplicates = proposedMoves.GroupBy(x => x.MoveTo).Where(g => g.Count() > 1).Select(y => y.Key).ToHashSet();
-                proposedMoves.RemoveAll(x => duplicates.Contains(x.MoveTo));
-
-                if (!proposedMoves.Any())
-                {
-                    Console.WriteLine($"Round: {roundNumber}");
-                    sw.Stop();
-                    Console.WriteLine($"{sw.ElapsedMilliseconds} ms");
-                    break;
-                }
-                foreach (var move in proposedMoves)
-                {
-                    elfPositions.Remove(move.MoveFrom);
-                    elfPositions.Add(move.MoveTo);
-                }
-
-                var direction = directions.Dequeue();
-                directions.Enqueue(direction);
+                var moved = SimulateRound();
+                if (!moved) break;
                 roundNumber++;
             }
             return CalculateEmptyTiles();
